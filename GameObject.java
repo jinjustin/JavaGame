@@ -10,10 +10,11 @@ public class GameObject {
 
     private Node view;
     private Point2D velocity = new Point2D(0, 0);
+    private int radius = 15;
 
     private boolean alive = true;
-    public static int enemiesCount = 0; 
-    public static int tanksCount = 0;
+    public static int foodsCount = 0; 
+    public static int virusesCount = 0;
     
     public GameObject(){
         
@@ -28,8 +29,14 @@ public class GameObject {
         view.setTranslateY(view.getTranslateY() + velocity.getY());
     }
     
-    public void radiusUpdate(int value){
-        view = new Circle(value, value, value, Color.BLUE);
+    public void radiusUpdate(){
+        radius++;
+        view = new Circle(radius, radius, radius, Color.BLUE);
+    }
+    
+    public void enemyRadiusUpdate(){
+        radius++;
+        view = new Circle(radius, radius, radius, Color.BLACK);
     }
     
 //    public void hpUpdate(int value) {
@@ -40,6 +47,11 @@ public class GameObject {
 //        view = new Rectangle(100*value,30, Color.YELLOW);
 //    }
 
+    public boolean radiusCompare(int playerRadius){
+        if(radius - playerRadius >= 10) return true;
+        else return false;
+    }
+    
     public void setVelocity(Point2D velocity) {
         this.velocity = velocity;
     }
@@ -75,4 +87,14 @@ public class GameObject {
     public boolean isColliding(GameObject other) {
         return getView().getBoundsInParent().intersects(other.getView().getBoundsInParent());
     }
+    
+    public void setRadius(int radius){
+        this.radius = radius;
+    }
+    
+    public int getRadius(){
+        return radius;
+    }
 }
+
+    

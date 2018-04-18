@@ -35,8 +35,7 @@ public class Astroid extends Application { //เขียน JavaFx ต้อง
     private List<GameObject> viruses = new ArrayList<>();
     private List<GameObject> enemies = new ArrayList<>();
 
-    private int score=0,power=10,HP=10;
-    private int radius=15;
+    private int score=0;
     private int powerCount=0;
     
     private GameObject player;
@@ -57,13 +56,20 @@ public class Astroid extends Application { //เขียน JavaFx ต้อง
         
         player = new Player();
         
+        for(int i=0;i<10;i++)
+            addEnemies(new Enemies(),Math.random() * root.getPrefWidth(), Math.random() * root.getPrefHeight());
+        
+        for(int i=0;i<30;i++){
+            addFood(new Food(), Math.random() * root.getPrefWidth(), Math.random() * root.getPrefHeight());
+            GameObject.foodsCount++;
+        }
+        
+        
 //        hpBar = new HPbar();
 //        powerBar = new PowerBar();
         
         player.setVelocity(new Point2D(2, 0)); //ความเร็วเริ่มต้นพอกดเปลี่ยนทิศทางความเร็วเหลือ 1  
-        addGameObject(player, 300, 300); //Method อยู่ในคลาสนี้
-        
-        
+        addGameObject(player, 300, 300); //Method อยู่ในคลาสนี้      
         
         scoreText.setFont(Font.font("Sans serif",FontWeight.NORMAL,FontPosture.REGULAR,50));
         scoreText.setFill(Color.RED);
@@ -104,6 +110,11 @@ public class Astroid extends Application { //เขียน JavaFx ต้อง
         viruses.add(virus);
         addGameObject(virus, x, y);
     }
+    
+    private void addEnemies(GameObject enemie, double x, double y){
+        enemies.add(enemie);
+        addGameObject(enemie,x,y);
+    }
 
     private void addGameObject(GameObject object, double x, double y) {
         object.getView().setTranslateX(x);
@@ -116,53 +127,124 @@ public class Astroid extends Application { //เขียน JavaFx ต้อง
             for (GameObject food : foods) {
                 if (player.isColliding(food)) {
                     score+=1;
-                    System.out.println("HP : "+HP);
-                    radius+=1;
                     double x= player.getView().getTranslateX(),y = player.getView().getTranslateY();
                     root.getChildren().removeAll(player.getView());
-                    player.radiusUpdate(radius);
+                    player.radiusUpdate();
                     addGameObject(player,x,y);
                     food.setAlive(false);
-                    System.out.println("Score : "+score);
                     root.getChildren().removeAll(food.getView());
-                    GameObject.enemiesCount--;
+                    GameObject.foodsCount--;
                 }
             }
         
             for (GameObject virus : viruses) { 
                 if (player.isColliding(virus)) {
+                    double x= player.getView().getTranslateX(),y = player.getView().getTranslateY();
+                    root.getChildren().removeAll(player.getView());
+                    player.setRadius(player.getRadius()/2);
+                    player.radiusUpdate();
+                    addGameObject(player,x,y);
                     virus.setAlive(false);
-                    if(HP<=5) HP+=5;
-                    else HP=10;
-                    System.out.println("HP : "+HP);
                     root.getChildren().removeAll(virus.getView());
-                    GameObject.tanksCount--;
+                    GameObject.virusesCount--;
                 }
+            }
+            
+            for(GameObject enemy : enemies){
+                for(GameObject food : foods){
+                    if (enemy.isColliding(food)) {
+                    double x= enemy.getView().getTranslateX(),y = enemy.getView().getTranslateY();
+                    root.getChildren().removeAll(enemy.getView());
+                    enemy.enemyRadiusUpdate();
+                    addGameObject(enemy,x,y);
+                    food.setAlive(false);
+                    root.getChildren().removeAll(food.getView());
+                    GameObject.foodsCount--;
+                    }
+                }
+                if(enemy.isColliding(player)){
+                    if(enemy.getRadius() > player.getRadius()){
+                    player.setAlive(false);
+                    root.getChildren().removeAll(player.getView());
+                    }
+                    else if(player.getRadius() > enemy.getRadius()){
+                        double x= player.getView().getTranslateX(),y = player.getView().getTranslateY();
+                        root.getChildren().removeAll(player.getView());
+                        player.setRadius(player.getRadius() + enemy.getRadius()/2);
+                        player.radiusUpdate();
+                        addGameObject(player,x,y);
+                        enemy.setAlive(false);
+                        root.getChildren().removeAll(enemy.getView());
+                    }
+                }
+                for(GameObject anotherEnemy : enemies){
+                    if(enemy.isColliding(anotherEnemy)){
+                        if(enemy.getRadius() > anotherEnemy.getRadius()){
+                        double x= player.getView().getTranslateX(),y = player.getView().getTranslateY();
+                        root.getChildren().removeAll(enemy.getView());
+                        enemy.setRadius(enemy.getRadius() + anotherEnemy.getRadius()/2);
+                        enemy.enemyRadiusUpdate();
+                        addGameObject(enemy,x,y);
+                        anotherEnemy.setAlive(false);
+                        root.getChildren().removeAll(anotherEnemy.getView());
+                        }
+                    }
+                }
+                for(GameObject virus : viruses){
+                    if (enemy.isColliding(virus)) {
+                    double x= enemy.getView().getTranslateX(),y = enemy.getView().getTranslateY();
+                    root.getChildren().removeAll(enemy.getView());
+                    enemy.setRadius(enemy.getRadius()/2);
+                    enemy.enemyRadiusUpdate();
+                    addGameObject(enemy,x,y);
+                    virus.setAlive(false);
+                    root.getChildren().removeAll(virus.getView());
+                    GameObject.virusesCount--;
+                    }
+                }
+            }
+            
+            foods.removeIf(GameObject::isDead);
+            
+            for(GameObject enemy : enemies){
+                double c=2000,x=1,y=0;
+                if(enemy.radiusCompare(player.getRadius())){
+                c = Math.sqrt(Math.pow((player.getView().getTranslateX()-enemy.getView().getTranslateX()) , 2) + Math.pow(player.getView().getTranslateY() - enemy.getView().getTranslateY(), 2) );
+                x=(player.getView().getTranslateX() - enemy.getView().getTranslateX())/c;
+                y=(player.getView().getTranslateY() - enemy.getView().getTranslateY())/c;
+                }
+                else{
+                for(GameObject food : foods){
+                    double temp = Math.sqrt(Math.pow((food.getView().getTranslateX()-enemy.getView().getTranslateX()) , 2) + Math.pow(food.getView().getTranslateY() - enemy.getView().getTranslateY(), 2) );
+                    if(Math.abs(temp) <= Math.abs(c)){
+                        c = temp;
+                        x = (food.getView().getTranslateX()-enemy.getView().getTranslateX())/c;
+                        y = (food.getView().getTranslateY() - enemy.getView().getTranslateY())/c;
+                        }
+                    }
+                }
+                enemy.setVelocity(new Point2D(3*x,3*y));
             }
 
         bullets.removeIf(GameObject::isDead); //Method isDead อยู่ในคลาส GameObject
         foods.removeIf(GameObject::isDead);
         viruses.removeIf(GameObject::isDead);
+        enemies.removeIf(GameObject::isDead);
 
         bullets.forEach(GameObject::update); //update อยู่ในคลาส GameObject
         foods.forEach(GameObject::update);
         viruses.forEach(GameObject::update);
+        enemies.forEach(GameObject::update);
 
        player.update();
 
-        if (randomWithRange(0,100) < 2 && GameObject.enemiesCount<20) {
-            Food food = new Food();
-            int colorRand = randomWithRange(0,5) ;
-            switch(colorRand)
-            {
-                case 1 : 
-            }
+        if (randomWithRange(0,100) < 4 && GameObject.foodsCount<40) {
             addFood(new Food(), Math.random() * root.getPrefWidth(), Math.random() * root.getPrefHeight());
-            GameObject.enemiesCount++;
+            GameObject.foodsCount++;
         }
-        if (randomWithRange(0,3000) < 2 && GameObject.tanksCount<2) {
+        if (randomWithRange(0,3000) < 3 && GameObject.virusesCount<3) {
             addVirus(new Virus(), Math.random() * root.getPrefWidth(), Math.random() * 855.0);
-            GameObject.tanksCount++;
+            GameObject.virusesCount++;
         }
         
         //คะแนน
@@ -216,17 +298,17 @@ public class Astroid extends Application { //เขียน JavaFx ต้อง
         }
     }
     
-    private class HPbar extends GameObject {
-        HPbar(){
-            super(new Rectangle(100*HP,30, Color.RED));
-        }
-    }
-    
-    private class PowerBar extends GameObject {
-        PowerBar(){
-            super(new Rectangle(100*power,30, Color.YELLOW));
-        }
-    }
+//    private class HPbar extends GameObject {
+//        HPbar(){
+//            super(new Rectangle(100*HP,30, Color.RED));
+//        }
+//    }
+//    
+//    private class PowerBar extends GameObject {
+//        PowerBar(){
+//            super(new Rectangle(100*power,30, Color.YELLOW));
+//        }
+//    }
 
     @Override
     public void start(Stage stage) throws Exception {
