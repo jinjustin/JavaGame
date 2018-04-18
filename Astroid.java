@@ -33,6 +33,7 @@ public class Astroid extends Application { //เขียน JavaFx ต้อง
     private List<GameObject> bullets = new ArrayList<>(); //List ของ GameObject ใช้เป็นกระสุน
     private List<GameObject> foods = new ArrayList<>(); //List ของ GameObject ใช้เป็นศัตรู
     private List<GameObject> viruses = new ArrayList<>();
+    private List<GameObject> enemies = new ArrayList<>();
 
     private int score=0,power=10,HP=10;
     private int radius=15;
@@ -61,7 +62,8 @@ public class Astroid extends Application { //เขียน JavaFx ต้อง
         
         player.setVelocity(new Point2D(2, 0)); //ความเร็วเริ่มต้นพอกดเปลี่ยนทิศทางความเร็วเหลือ 1  
         addGameObject(player, 300, 300); //Method อยู่ในคลาสนี้
-
+        
+        
         
         scoreText.setFont(Font.font("Sans serif",FontWeight.NORMAL,FontPosture.REGULAR,50));
         scoreText.setFill(Color.RED);
@@ -92,17 +94,13 @@ public class Astroid extends Application { //เขียน JavaFx ต้อง
    return (int)(Math.random() * range) + min;
     }
 
-    private void addBullet(GameObject bullet, double x, double y) {
-        bullets.add(bullet); //เพิ่ม Object ลงใน ArrayList
-        addGameObject(bullet, x, y);
-    }
 
     private void addFood(GameObject enemy, double x, double y) {
         foods.add(enemy);
         addGameObject(enemy, x, y);
     }
     
-    private void addTank(GameObject virus, double x, double y) {
+    private void addVirus(GameObject virus, double x, double y) {
         viruses.add(virus);
         addGameObject(virus, x, y);
     }
@@ -163,7 +161,7 @@ public class Astroid extends Application { //เขียน JavaFx ต้อง
             GameObject.enemiesCount++;
         }
         if (randomWithRange(0,3000) < 2 && GameObject.tanksCount<2) {
-            addTank(new Virus(), Math.random() * root.getPrefWidth(), Math.random() * 855.0);
+            addVirus(new Virus(), Math.random() * root.getPrefWidth(), Math.random() * 855.0);
             GameObject.tanksCount++;
         }
         
@@ -186,15 +184,35 @@ public class Astroid extends Application { //เขียน JavaFx ต้อง
         }
     }
 
-    private static class Food extends GameObject {
+    private class Food extends GameObject {
         Food() {
-            super(new Circle(5, 5, 5, Color.RED));
+            super();
+            int colorRand = randomWithRange(0, 5);
+            switch(colorRand){
+                case 0 : super.setView(new Circle(8, 8 ,8,Color.RED));
+                break;
+                case 1 : super.setView(new Circle(8, 8 ,8,Color.CORAL));
+                break;
+                case 2 : super.setView(new Circle(8, 8 ,8,Color.AQUA));
+                break;
+                case 3 : super.setView(new Circle(8, 8 ,8,Color.DARKVIOLET));
+                break;
+                case 4 : super.setView(new Circle(8, 8 ,8,Color.MAGENTA));
+                break;
+                case 5 : super.setView(new Circle(8, 8 ,8,Color.ORANGE));    
+            }
         }
     }
     
     private static class Virus extends GameObject {
         Virus() {
-            super(new Rectangle(20, 40, Color.GREEN));
+            super(new Rectangle(40, 40, Color.GREEN));
+        }
+    }
+    
+    private static class Enemies extends GameObject {
+        Enemies(){
+            super(new Circle(15, 15 ,15,Color.BLACK));
         }
     }
     

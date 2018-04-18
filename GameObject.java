@@ -15,6 +15,10 @@ public class GameObject {
     public static int enemiesCount = 0; 
     public static int tanksCount = 0;
     
+    public GameObject(){
+        
+    }
+    
     public GameObject(Node view) {
         this.view = view;
     }
@@ -46,6 +50,10 @@ public class GameObject {
 
     public Node getView() {
         return view;
+    }
+    
+    public void setView(Node view){
+        this.view = view;
     }
 
     public boolean isAlive() {
