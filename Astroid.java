@@ -28,7 +28,7 @@ public class Astroid extends Application {
 
     private Pane root; 
     
-    private StackPane menuRoot; 
+    private Pane overRoot; 
 
     private List<GameObject> foods = new ArrayList<>(); 
     private List<GameObject> viruses = new ArrayList<>();
@@ -39,7 +39,8 @@ public class Astroid extends Application {
     
     private GameObject player;
     
-    private Text scoreText = new Text("Score : "+ score); 
+    private Text scoreText = new Text("Score : "+ score);
+    private Text gameOver = new Text("GameOver");
 
     private Parent gameContent() { 
         root = new Pane(); 
@@ -80,9 +81,26 @@ public class Astroid extends Application {
         return root;
     }
     
-    private Parent gameMenu(){ 
+    private Parent gameOverScene(){
         
-        return menuRoot;
+        overRoot = new Pane(); 
+        root.setPrefSize(1300, 1000);  
+        
+        gameOver.setFont(Font.font("Sans serif",FontWeight.NORMAL,FontPosture.REGULAR,100));
+        gameOver.setFill(Color.RED);
+        gameOver.setX(500.0);
+        gameOver.setY(500.0);
+        root.getChildren().add(gameOver);
+            
+        AnimationTimer timer = new AnimationTimer() {
+            @Override
+            public void handle(long now) {
+                onUpdate();
+            }
+        };
+        timer.start();
+        
+        return overRoot;
     }
     
    public int randomWithRange(int min, int max){ 
@@ -252,14 +270,20 @@ public class Astroid extends Application {
 
     @Override
     public void start(Stage stage) throws Exception {
-        
-        
         stage.setScene(new Scene(gameContent()));
         stage.getScene().setOnMouseMoved(e -> {
             double c = Math.sqrt(Math.pow((e.getX()-player.getView().getTranslateX()) , 2) + Math.pow(e.getY() - player.getView().getTranslateY(), 2) );
             player.setVelocity(new Point2D(3*(e.getX()-player.getView().getTranslateX())/c,3*(e.getY()-player.getView().getTranslateY())/c));
         });
-        stage.show();
+//        if(player.isDead()){
+//            stage.setScene(new Scene(gameOverScene()));
+//            stage.getScene().setOnKeyPressed(e -> {
+//            if(e.getCode() == KeyCode.ENTER){
+//                player.setAlive(true);
+//            }
+//        });
+//        stage.show();
+//    }
     }
 
     public static void main(String[] args) {
