@@ -7,6 +7,8 @@ class Enemies extends GameObject {
         Enemies(){
             super(new Circle(15, 15 ,15,Color.BLACK));
         }
+        
+        
       
         @Override
         public void radiusUpdate(){

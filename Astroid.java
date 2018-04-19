@@ -28,22 +28,28 @@ public class Astroid extends Application {
 
     private Pane root; 
     
-    private StackPane menuRoot; 
+    private Pane overRoot; 
 
     private List<GameObject> foods = new ArrayList<>(); 
     private List<GameObject> viruses = new ArrayList<>();
     private List<GameObject> enemies = new ArrayList<>();
 
-    private int score=0;
-    private int powerCount=0;
+    private Score score;
     
     private GameObject player;
     
-    private Text scoreText = new Text("Score : "+ score); 
-
-    private Parent gameContent() { 
+    private Text scoreText; 
+    private Text gameOver = new Text("GameOver");
+    
+    private Parent gameContent() throws Exception { 
         root = new Pane(); 
         root.setPrefSize(1300, 1000);
+        
+        ReadFile r = new ReadFile();
+        
+        score = r.readFile();
+        score.setZeroScore();
+        scoreText = new Text();
         
         //BG
         ImageView iv = new ImageView("https://i.pinimg.com/originals/79/c7/b6/79c7b6a3c85ac3d99581216e35f3938e.png"); //
@@ -53,8 +59,10 @@ public class Astroid extends Application {
         
         player = new Player();
         
-        for(int i=0;i<3;i++)
+        for(int i=0;i<3;i++){
             addEnemies(new Enemies(),Math.random() * root.getPrefWidth(), Math.random() * root.getPrefHeight());
+            GameObject.enemiesCount++;
+        }
         
         for(int i=0;i<30;i++){
             addFood(new Food(), Math.random() * root.getPrefWidth(), Math.random() * root.getPrefHeight());
@@ -69,7 +77,7 @@ public class Astroid extends Application {
         scoreText.setX(1030.0);
         scoreText.setY(940.0);
         root.getChildren().add(scoreText);
-            
+        
         AnimationTimer timer = new AnimationTimer() {
             @Override
             public void handle(long now) {
@@ -80,9 +88,26 @@ public class Astroid extends Application {
         return root;
     }
     
-    private Parent gameMenu(){ 
+   private Parent gameOverScene(){
         
-        return menuRoot;
+        overRoot = new Pane(); 
+        root.setPrefSize(1300, 1000);  
+        
+        gameOver.setFont(Font.font("Sans serif",FontWeight.NORMAL,FontPosture.REGULAR,100));
+        gameOver.setFill(Color.RED);
+        gameOver.setX(500.0);
+        gameOver.setY(500.0);
+        root.getChildren().add(gameOver);
+            
+        AnimationTimer timer = new AnimationTimer() {
+            @Override
+            public void handle(long now) {
+                onUpdate();
+            }
+        };
+        timer.start();
+        
+        return overRoot;
     }
     
    public int randomWithRange(int min, int max){ 
@@ -116,7 +141,7 @@ public class Astroid extends Application {
         
             for (GameObject food : foods) {
                 if (player.isColliding(food)) {
-                    score+=1;
+                    score.updateScore();
                     double x= player.getView().getTranslateX(),y = player.getView().getTranslateY();
                     root.getChildren().removeAll(player.getView());
                     player.radiusUpdate();
@@ -161,6 +186,18 @@ public class Astroid extends Application {
                     addGameObject(enemy,x,y);
                     player.setAlive(false);
                     root.getChildren().removeAll(player.getView());
+                    WriteFile w = new WriteFile();
+                    try{
+                    score.setRanking();
+                    w.writeFile(score);
+                    score.setZeroScore();
+                    for(int i=0;i<5;i++){
+                        System.out.println(score.getScore()[i]);
+                    }
+                    }
+                    catch(Exception e){
+                        System.out.println("Error");
+                    }
                     }
                     else if(player.getRadius() > enemy.getRadius()){
                         double x= player.getView().getTranslateX(),y = player.getView().getTranslateY();
@@ -170,6 +207,7 @@ public class Astroid extends Application {
                         addGameObject(player,x,y);
                         enemy.setAlive(false);
                         root.getChildren().removeAll(enemy.getView());
+                        score.setCurrentScore(score.getCurrentScore()+10);
                     }
                 }
                 for(GameObject anotherEnemy : enemies){
@@ -246,19 +284,18 @@ public class Astroid extends Application {
         }
         
         //คะแนน
-        scoreText.setText("Score : " + score);
+        scoreText.setText("Score : " + score.getCurrentScore());
 
     }
 
     @Override
     public void start(Stage stage) throws Exception {
-        
-        
         stage.setScene(new Scene(gameContent()));
         stage.getScene().setOnMouseMoved(e -> {
             double c = Math.sqrt(Math.pow((e.getX()-player.getView().getTranslateX()) , 2) + Math.pow(e.getY() - player.getView().getTranslateY(), 2) );
             player.setVelocity(new Point2D(3*(e.getX()-player.getView().getTranslateX())/c,3*(e.getY()-player.getView().getTranslateY())/c));
         });
+        
         stage.show();
     }
 
