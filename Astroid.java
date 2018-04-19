@@ -41,6 +41,8 @@ public class Astroid extends Application {
     private Text scoreText; 
     private Text gameOver = new Text("GameOver");
     
+    private Difficulties difficulties = new Difficulties('H');
+    
     private Parent gameContent() throws Exception { 
         root = new Pane(); 
         root.setPrefSize(1300, 1000);
