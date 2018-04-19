@@ -34,21 +34,8 @@ public class GameObject {
         view = new Circle(radius, radius, radius, Color.BLUE);
     }
     
-    public void enemyRadiusUpdate(){
-        radius++;
-        view = new Circle(radius, radius, radius, Color.BLACK);
-    }
-    
-//    public void hpUpdate(int value) {
-//        view = new Rectangle(100*value,30, Color.RED);
-//    }
-//    
-//    public void powerUpdate(int value) {
-//        view = new Rectangle(100*value,30, Color.YELLOW);
-//    }
-
-    public boolean radiusCompare(int playerRadius){
-        if(radius - playerRadius >= 10) return true;
+    public boolean radiusCompare(int anotherRadius){
+        if(radius - anotherRadius >= 10) return true;
         else return false;
     }
     

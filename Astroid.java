@@ -24,14 +24,13 @@ import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 
-public class Astroid extends Application { //เขียน JavaFx ต้อง extends Application เสมอ
+public class Astroid extends Application { 
 
-    private Pane root; //หน้าจอเกม
+    private Pane root; 
     
-    private StackPane menuRoot; //หน้าจอ Menu ตอนเข้าเกม
+    private StackPane menuRoot; 
 
-    private List<GameObject> bullets = new ArrayList<>(); //List ของ GameObject ใช้เป็นกระสุน
-    private List<GameObject> foods = new ArrayList<>(); //List ของ GameObject ใช้เป็นศัตรู
+    private List<GameObject> foods = new ArrayList<>(); 
     private List<GameObject> viruses = new ArrayList<>();
     private List<GameObject> enemies = new ArrayList<>();
 
@@ -39,13 +38,11 @@ public class Astroid extends Application { //เขียน JavaFx ต้อง
     private int powerCount=0;
     
     private GameObject player;
-//    private GameObject hpBar;
-//    private GameObject powerBar;
     
-    private Text scoreText = new Text("Score : "+ score); //Text ของคะแนน
+    private Text scoreText = new Text("Score : "+ score); 
 
-    private Parent gameContent() { //ยังงงว่า Parent คืออะไร
-        root = new Pane(); //กำหนดให้ root เป็น layout อันใหม่
+    private Parent gameContent() { 
+        root = new Pane(); 
         root.setPrefSize(1300, 1000);
         
         //BG
@@ -64,21 +61,14 @@ public class Astroid extends Application { //เขียน JavaFx ต้อง
             GameObject.foodsCount++;
         }
         
-        
-//        hpBar = new HPbar();
-//        powerBar = new PowerBar();
-        
-        player.setVelocity(new Point2D(2, 0)); //ความเร็วเริ่มต้นพอกดเปลี่ยนทิศทางความเร็วเหลือ 1  
-        addGameObject(player, 300, 300); //Method อยู่ในคลาสนี้      
+        player.setVelocity(new Point2D(2, 0)); 
+        addGameObject(player, 300, 300);     
         
         scoreText.setFont(Font.font("Sans serif",FontWeight.NORMAL,FontPosture.REGULAR,50));
         scoreText.setFill(Color.RED);
         scoreText.setX(1030.0);
         scoreText.setY(940.0);
         root.getChildren().add(scoreText);
-        
-//        addGameObject(hpBar,20,900);
-//        addGameObject(powerBar,20,940);
             
         AnimationTimer timer = new AnimationTimer() {
             @Override
@@ -90,12 +80,12 @@ public class Astroid extends Application { //เขียน JavaFx ต้อง
         return root;
     }
     
-    private Parent gameMenu(){ //incompleted
+    private Parent gameMenu(){ 
         
         return menuRoot;
     }
     
-    private int randomWithRange(int min, int max){ //สุ่มตัวเลข
+   public int randomWithRange(int min, int max){ 
    int range = (max - min) + 1;     
    return (int)(Math.random() * range) + min;
     }
@@ -119,7 +109,7 @@ public class Astroid extends Application { //เขียน JavaFx ต้อง
     private void addGameObject(GameObject object, double x, double y) {
         object.getView().setTranslateX(x);
         object.getView().setTranslateY(y);
-        root.getChildren().add(object.getView()); // ไม่รู้ว่า children คืออะไร 
+        root.getChildren().add(object.getView()); 
     }
 
     private void onUpdate() {
@@ -155,7 +145,7 @@ public class Astroid extends Application { //เขียน JavaFx ต้อง
                     if (enemy.isColliding(food)) {
                     double x= enemy.getView().getTranslateX(),y = enemy.getView().getTranslateY();
                     root.getChildren().removeAll(enemy.getView());
-                    enemy.enemyRadiusUpdate();
+                    enemy.radiusUpdate();
                     addGameObject(enemy,x,y);
                     food.setAlive(false);
                     root.getChildren().removeAll(food.getView());
@@ -167,7 +157,7 @@ public class Astroid extends Application { //เขียน JavaFx ต้อง
                     double x= enemy.getView().getTranslateX(),y = enemy.getView().getTranslateY();
                     root.getChildren().removeAll(enemy.getView());
                     enemy.setRadius(enemy.getRadius() + enemy.getRadius()/2);
-                    enemy.enemyRadiusUpdate();
+                    enemy.radiusUpdate();
                     addGameObject(enemy,x,y);
                     player.setAlive(false);
                     root.getChildren().removeAll(player.getView());
@@ -188,7 +178,7 @@ public class Astroid extends Application { //เขียน JavaFx ต้อง
                         double x= enemy.getView().getTranslateX(),y = enemy.getView().getTranslateY();
                         root.getChildren().removeAll(enemy.getView());
                         enemy.setRadius(enemy.getRadius() + anotherEnemy.getRadius()/2);
-                        enemy.enemyRadiusUpdate();
+                        enemy.radiusUpdate();
                         addGameObject(enemy,x,y);
                         anotherEnemy.setAlive(false);
                         root.getChildren().removeAll(anotherEnemy.getView());
@@ -200,7 +190,7 @@ public class Astroid extends Application { //เขียน JavaFx ต้อง
                     double x= enemy.getView().getTranslateX(),y = enemy.getView().getTranslateY();
                     root.getChildren().removeAll(enemy.getView());
                     enemy.setRadius(enemy.getRadius()/2);
-                    enemy.enemyRadiusUpdate();
+                    enemy.radiusUpdate();
                     addGameObject(enemy,x,y);
                     virus.setAlive(false);
                     root.getChildren().removeAll(virus.getView());
@@ -213,7 +203,7 @@ public class Astroid extends Application { //เขียน JavaFx ต้อง
             
             for(GameObject enemy : enemies){
                 double c=2000,x=1,y=0;
-                if(enemy.radiusCompare(player.getRadius())){
+                if(enemy.radiusCompare(player.getRadius()) ){
                 c = Math.sqrt(Math.pow((player.getView().getTranslateX()-enemy.getView().getTranslateX()) , 2) + Math.pow(player.getView().getTranslateY() - enemy.getView().getTranslateY(), 2) );
                 x=(player.getView().getTranslateX() - enemy.getView().getTranslateX())/c;
                 y=(player.getView().getTranslateY() - enemy.getView().getTranslateY())/c;
@@ -257,66 +247,8 @@ public class Astroid extends Application { //เขียน JavaFx ต้อง
         
         //คะแนน
         scoreText.setText("Score : " + score);
-        
-//        root.getChildren().removeAll(hpBar.getView());
-//        hpBar.hpUpdate(HP);
-//        addGameObject(hpBar,20,900);
-//        
-//        root.getChildren().removeAll(powerBar.getView());
-//        powerBar.powerUpdate(power);
-//        addGameObject(powerBar,20,940);
-        
-    }
 
-    private static class Player extends GameObject {
-        Player() {
-            super(new Circle(15, 15 ,15,Color.BLUE));
-        }
     }
-
-    private class Food extends GameObject {
-        Food() {
-            super();
-            int colorRand = randomWithRange(0, 5);
-            switch(colorRand){
-                case 0 : super.setView(new Circle(8, 8 ,8,Color.RED));
-                break;
-                case 1 : super.setView(new Circle(8, 8 ,8,Color.CORAL));
-                break;
-                case 2 : super.setView(new Circle(8, 8 ,8,Color.AQUA));
-                break;
-                case 3 : super.setView(new Circle(8, 8 ,8,Color.DARKVIOLET));
-                break;
-                case 4 : super.setView(new Circle(8, 8 ,8,Color.MAGENTA));
-                break;
-                case 5 : super.setView(new Circle(8, 8 ,8,Color.ORANGE));    
-            }
-        }
-    }
-    
-    private static class Virus extends GameObject {
-        Virus() {
-            super(new Rectangle(40, 40, Color.GREEN));
-        }
-    }
-    
-    private static class Enemies extends GameObject {
-        Enemies(){
-            super(new Circle(15, 15 ,15,Color.BLACK));
-        }
-    }
-    
-//    private class HPbar extends GameObject {
-//        HPbar(){
-//            super(new Rectangle(100*HP,30, Color.RED));
-//        }
-//    }
-//    
-//    private class PowerBar extends GameObject {
-//        PowerBar(){
-//            super(new Rectangle(100*power,30, Color.YELLOW));
-//        }
-//    }
 
     @Override
     public void start(Stage stage) throws Exception {
