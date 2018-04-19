@@ -56,7 +56,7 @@ public class Astroid extends Application { //เขียน JavaFx ต้อง
         
         player = new Player();
         
-        for(int i=0;i<10;i++)
+        for(int i=0;i<3;i++)
             addEnemies(new Enemies(),Math.random() * root.getPrefWidth(), Math.random() * root.getPrefHeight());
         
         for(int i=0;i<30;i++){
@@ -163,7 +163,12 @@ public class Astroid extends Application { //เขียน JavaFx ต้อง
                     }
                 }
                 if(enemy.isColliding(player)){
-                    if(enemy.getRadius() > player.getRadius()){
+                    if(enemy.getRadius() > player.getRadius() && player.isAlive()){
+                    double x= enemy.getView().getTranslateX(),y = enemy.getView().getTranslateY();
+                    root.getChildren().removeAll(enemy.getView());
+                    enemy.setRadius(enemy.getRadius() + enemy.getRadius()/2);
+                    enemy.enemyRadiusUpdate();
+                    addGameObject(enemy,x,y);
                     player.setAlive(false);
                     root.getChildren().removeAll(player.getView());
                     }
@@ -180,7 +185,7 @@ public class Astroid extends Application { //เขียน JavaFx ต้อง
                 for(GameObject anotherEnemy : enemies){
                     if(enemy.isColliding(anotherEnemy)){
                         if(enemy.getRadius() > anotherEnemy.getRadius()){
-                        double x= player.getView().getTranslateX(),y = player.getView().getTranslateY();
+                        double x= enemy.getView().getTranslateX(),y = enemy.getView().getTranslateY();
                         root.getChildren().removeAll(enemy.getView());
                         enemy.setRadius(enemy.getRadius() + anotherEnemy.getRadius()/2);
                         enemy.enemyRadiusUpdate();
@@ -226,17 +231,18 @@ public class Astroid extends Application { //เขียน JavaFx ต้อง
                 enemy.setVelocity(new Point2D(3*x,3*y));
             }
 
-        bullets.removeIf(GameObject::isDead); //Method isDead อยู่ในคลาส GameObject
         foods.removeIf(GameObject::isDead);
         viruses.removeIf(GameObject::isDead);
         enemies.removeIf(GameObject::isDead);
 
-        bullets.forEach(GameObject::update); //update อยู่ในคลาส GameObject
+        if(player.isAlive()){
         foods.forEach(GameObject::update);
         viruses.forEach(GameObject::update);
         enemies.forEach(GameObject::update);
 
+       
        player.update();
+        
 
         if (randomWithRange(0,100) < 4 && GameObject.foodsCount<40) {
             addFood(new Food(), Math.random() * root.getPrefWidth(), Math.random() * root.getPrefHeight());
@@ -245,6 +251,8 @@ public class Astroid extends Application { //เขียน JavaFx ต้อง
         if (randomWithRange(0,3000) < 3 && GameObject.virusesCount<3) {
             addVirus(new Virus(), Math.random() * root.getPrefWidth(), Math.random() * 855.0);
             GameObject.virusesCount++;
+        }
+        
         }
         
         //คะแนน
