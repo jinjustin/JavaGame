@@ -13,9 +13,6 @@ public class GameObject {
     private int radius = 15;
 
     private boolean alive = true;
-    public static int foodsCount = 0; 
-    public static int virusesCount = 0;
-    public static int enemiesCount = 0;
     
     public GameObject(){
         

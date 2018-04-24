@@ -4,6 +4,11 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 
 class Food extends GameObject {
+    
+    public static int foodsCount = 0; 
+    public static int time = 0;
+    public static final int spawnTime = 20;
+    
         Food() {
             super();
             RandomColor();
@@ -26,4 +31,25 @@ class Food extends GameObject {
                 case 5 : super.setView(new Circle(8, 8 ,8,Color.ORANGE));    
             }
         }
+
+    public static int getFoodsCount() {
+        return foodsCount;
+    }
+
+    public static void setFoodsCount(int foodsCount) {
+        Food.foodsCount = foodsCount;
+    }
+
+    public static int getTime() {
+        return time;
+    }
+
+    public static void setTime(int time) {
+        Food.time = time;
+    }
+    
+    public static void timeUpdate(){
+        time++;
+    }
+        
     }
