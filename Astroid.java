@@ -22,11 +22,29 @@ import javafx.scene.paint.ImagePattern;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
-import javafx.scene.text.Text;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import javafx.application.*;
+import javafx.stage.*;
+import javafx.geometry.*;
+import javafx.scene.*;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
+import javafx.scene.paint.LinearGradient;
+import javafx.scene.paint.Stop;
+import javafx.scene.shape.Line;
+import javafx.scene.text.*;
+import javafx.scene.paint.CycleMethod;
 
 public class Astroid extends Application { 
 
     private Pane root; 
+    private Stage window;
+    private Scene scenemenu,sceneplay,scenehighscore;
     
     private Pane overRoot; 
 
@@ -43,6 +61,149 @@ public class Astroid extends Application {
     private Text gameOver = new Text("GameOver");
     
     private Difficulties difficulties = new Difficulties('E');
+    
+    private Parent createContent() {
+		Pane root = new Pane();
+		
+		root.setPrefSize(1280, 720);
+		
+		try(InputStream is = Files.newInputStream(Paths.get("C:\\Users\\E2042\\Documents\\NetBeansProjects\\menu3\\src\\testmemu2\\backgroundas.png"))){
+			ImageView img = new ImageView(new Image(is));
+			img.setFitWidth(1280);
+			img.setFitHeight(720);
+			root.getChildren().add(img);
+		}
+		catch(IOException e) {
+			System.out.println("Couldn't load image");
+		}
+		
+		Title title = new Title ("Asteroid.io");
+		title.setTranslateX(450);
+		title.setTranslateY(200);
+                
+		
+		MenuBox vbox = new MenuBox(
+				new MenuItem("Play"),
+				new MenuItem("Highscore"),
+				new MenuItem("Exit")
+                );
+		vbox.setTranslateX(525);
+		vbox.setTranslateY(350);                
+                
+		
+		root.getChildren().addAll(title,vbox);
+		
+		return root;
+		
+	}
+    
+    private static class Title extends StackPane{
+		public Title(String name) {
+			Rectangle bg = new Rectangle(400, 80);
+			bg.setStroke(Color.WHITE);
+			bg.setStrokeWidth(2);
+			bg.setFill(null);
+			
+			Text text = new Text(name);
+			text.setFill(Color.CADETBLUE);
+			text.setFont(Font.font("Times New Roman", FontWeight.SEMI_BOLD, 80));
+			
+			setAlignment(Pos.CENTER);
+			getChildren().addAll(bg,text);
+		}
+	}
+    
+    private static class MenuBox extends VBox{
+		public MenuBox(MenuItem...items) {
+			
+                    getChildren().add(createSeperator());
+			
+			for(MenuItem item : items) {
+				getChildren().addAll(item, createSeperator());
+                                
+			}
+                        
+                        
+		}
+		
+		private Line createSeperator() {
+			Line sep = new Line();
+			sep.setEndX(210);
+			sep.setStroke(Color.DARKGREY);
+			return sep;
+		}
+		
+	}
+    
+    private class MenuItem extends StackPane{
+		public MenuItem(String name) {
+			LinearGradient gradient = new LinearGradient(0, 0, 1, 0, true, CycleMethod.NO_CYCLE, new Stop[] { 
+				new Stop(0, Color.RED),
+				new Stop(0.1, Color.BLACK),
+				new Stop(0.9, Color.BLACK),
+				new Stop(1, Color.RED)			
+                                
+			});
+			
+                       
+                        
+			Rectangle bg = new Rectangle(200,35);
+			bg.setOpacity(0.4);
+			
+			Text text = new Text(name);
+			text.setFill(Color.DARKGREY);
+			text.setFont(Font.font("Times New Roman", FontWeight.SEMI_BOLD,25));
+			
+			setAlignment(Pos.CENTER);
+			getChildren().addAll(bg, text);
+			setOnMouseEntered(event -> {
+				bg.setFill(gradient);
+				text.setFill(Color.WHITE);
+				
+			});
+			
+			setOnMouseExited(event -> {
+				bg.setFill(Color.BLACK);
+				text.setFill(Color.DARKGREY);
+			});
+                        
+			setOnMousePressed(event -> {
+				bg.setFill(Color.GREEN);
+				
+			});
+			
+			setOnMouseReleased(event -> {
+				bg.setFill(gradient);                                
+                                if(name.equals("Play")){
+                                    window.setScene(sceneplay);
+                                    window.getScene().setOnMouseMoved(e -> {
+            double c = Math.sqrt(Math.pow((e.getX()-player.getView().getTranslateX()) , 2) + Math.pow(e.getY() - player.getView().getTranslateY(), 2) );
+            player.setVelocity(new Point2D(3*(e.getX()-player.getView().getTranslateX())/c,3*(e.getY()-player.getView().getTranslateY())/c));
+        });
+                                    window.getScene().setOnMouseClicked(e -> {
+                    score.updateScore();
+                    double x= player.getView().getTranslateX(),y = player.getView().getTranslateY();
+                    root.getChildren().removeAll(player.getView());
+                    player.setRadius(player.getRadius()/2);
+                    player.radiusUpdate();
+                    addGameObject(player,x,y);
+                    Mutation m = new Mutation(player.getRadius()/2);
+                    m.radiusUpdate();
+                    addMutation(m,player.getView().getTranslateX(),player.getView().getTranslateY());
+                    m.setVelocity(new Point2D(1.5*player.getVelocity().getX(),1.5*player.getVelocity().getY()));
+        });
+                                    player.setAlive(true);
+                                    
+                                }
+                                if(name.equals("Exit")){
+                                    System.exit(0);
+                                }
+			});         
+                        
+                        
+			
+			}
+		}
     
     private Parent gameContent() throws Exception { 
         root = new Pane(); 
@@ -83,11 +244,6 @@ public class Astroid extends Application {
                 break;
         }
         
-//        for(int i=0;i<3;i++){
-//            addEnemies(new Enemies(),Math.random() * root.getPrefWidth(), Math.random() * root.getPrefHeight());
-//            Enemies.enemiesCount++;
-//        }
-        
         for(int i=0;i<30;i++){
             addFood(new Food(), Math.random() * root.getPrefWidth(), Math.random() * root.getPrefHeight());
             Food.foodsCount++;
@@ -110,28 +266,6 @@ public class Astroid extends Application {
         };
         timer.start();
         return root;
-    }
-    
-   private Parent gameOverScene(){
-        
-        overRoot = new Pane(); 
-        root.setPrefSize(1300, 1000);  
-        
-        gameOver.setFont(Font.font("Sans serif",FontWeight.NORMAL,FontPosture.REGULAR,100));
-        gameOver.setFill(Color.RED);
-        gameOver.setX(500.0);
-        gameOver.setY(500.0);
-        root.getChildren().add(gameOver);
-            
-        AnimationTimer timer = new AnimationTimer() {
-            @Override
-            public void handle(long now) {
-                onUpdate();
-            }
-        };
-        timer.start();
-        
-        return overRoot;
     }
     
    public int randomWithRange(int min, int max){ 
@@ -301,7 +435,7 @@ public class Astroid extends Application {
                 if(mutation.isColliding(player)&& mutation.getPassTime()>Mutation.daley){
                         double x= player.getView().getTranslateX(),y = player.getView().getTranslateY();
                         root.getChildren().removeAll(player.getView());
-                        player.setRadius(player.getRadius() + mutation.getRadius()/2);
+                        player.setRadius(player.getRadius() + mutation.getRadius());
                         player.radiusUpdate();
                         addGameObject(player,x,y);
                         mutation.setAlive(false);
@@ -392,28 +526,39 @@ public class Astroid extends Application {
         //คะแนน
         scoreText.setText("Score : " + score.getCurrentScore());
 
+        //เช็คตาย
+        if(player.isDead()){
+            window.setScene(scenemenu);
+        }
+        
     }
 
     @Override
     public void start(Stage stage) throws Exception {
-        stage.setScene(new Scene(gameContent()));
-        stage.getScene().setOnMouseMoved(e -> {
-            double c = Math.sqrt(Math.pow((e.getX()-player.getView().getTranslateX()) , 2) + Math.pow(e.getY() - player.getView().getTranslateY(), 2) );
-            player.setVelocity(new Point2D(3*(e.getX()-player.getView().getTranslateX())/c,3*(e.getY()-player.getView().getTranslateY())/c));
-        });
-        stage.getScene().setOnMouseClicked(e -> {
-            score.updateScore();
-                    double x= player.getView().getTranslateX(),y = player.getView().getTranslateY();
-                    root.getChildren().removeAll(player.getView());
-                    player.setRadius(player.getRadius()/2);
-                    player.radiusUpdate();
-                    addGameObject(player,x,y);
-                    Mutation m = new Mutation(player.getRadius()/2);
-                    m.radiusUpdate();
-                    addMutation(m,player.getView().getTranslateX(),player.getView().getTranslateY());
-                    m.setVelocity(new Point2D(1.5*player.getVelocity().getX(),1.5*player.getVelocity().getY()));
-        });
-        stage.show();
+//        stage.setScene(new Scene(gameContent()));
+//        stage.getScene().setOnMouseMoved(e -> {
+//            double c = Math.sqrt(Math.pow((e.getX()-player.getView().getTranslateX()) , 2) + Math.pow(e.getY() - player.getView().getTranslateY(), 2) );
+//            player.setVelocity(new Point2D(3*(e.getX()-player.getView().getTranslateX())/c,3*(e.getY()-player.getView().getTranslateY())/c));
+//        });
+//        stage.getScene().setOnMouseClicked(e -> {
+//            score.updateScore();
+//                    double x= player.getView().getTranslateX(),y = player.getView().getTranslateY();
+//                    root.getChildren().removeAll(player.getView());
+//                    player.setRadius(player.getRadius()/2);
+//                    player.radiusUpdate();
+//                    addGameObject(player,x,y);
+//                    Mutation m = new Mutation(player.getRadius()/2);
+//                    m.radiusUpdate();
+//                    addMutation(m,player.getView().getTranslateX(),player.getView().getTranslateY());
+//                    m.setVelocity(new Point2D(1.5*player.getVelocity().getX(),1.5*player.getVelocity().getY()));
+//        });
+        window = stage;
+        scenemenu  = new Scene(createContent());
+        sceneplay = new Scene(gameContent());
+        window.setTitle("Asteriods.io");
+        window.setScene(scenemenu);
+        window.show(); 
+//        stage.show();
     }
 
     public static void main(String[] args) {
