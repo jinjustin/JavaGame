@@ -16,7 +16,7 @@ public class ReadFile {
     try{
         ObjectInputStream is = new ObjectInputStream(new FileInputStream(fileName));
         s = (Score) is.readObject();
-        System.out.println("Success");
+        //System.out.println("Success");
         is.close();
     }
     catch (FileNotFoundException e){
@@ -27,4 +27,4 @@ public class ReadFile {
     }
     return s;
   }
-    }
+}

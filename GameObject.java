@@ -2,7 +2,9 @@ package astroid;
 
 import javafx.geometry.Point2D;
 import javafx.scene.Node;
+import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 
@@ -29,7 +31,7 @@ public class GameObject {
     
     public void radiusUpdate(){
         radius++;
-        view = new Circle(radius, radius, radius, Color.BLUE);
+        view = new Circle(radius, radius, radius,new ImagePattern(new Image(astroid.Player.class.getResource("player.png").toExternalForm())));
     }
     
     public boolean radiusCompare(int anotherRadius){
